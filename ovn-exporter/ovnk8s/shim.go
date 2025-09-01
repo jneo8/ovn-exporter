@@ -7,13 +7,14 @@ import (
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 	"github.com/rs/zerolog/log"
 	kexec "k8s.io/utils/exec"
+	libovsdbclient "github.com/ovn-kubernetes/libovsdb/client"
 )
 
 type Register interface {
 	SetExec() error
-	RegisterOvsMetricsWithOvnMetrics(stopChan <-chan struct{})
+	RegisterOvsMetricsWithOvnMetrics(ovsDBClient libovsdbclient.Client, metricsScrapeInterval int, stopChan <-chan struct{})
 	RegisterOvnDBMetrics(stopChan <-chan struct{})
-	RegisterOvnControllerMetrics(stopChan <-chan struct{})
+	RegisterOvnControllerMetrics(ovsDBClient libovsdbclient.Client, metricsScrapeInterval int, stopChan <-chan struct{})
 	RegisterOvnNorthdMetrics(stopChan <-chan struct{})
 	StartOVNMetricsServer(bindAddress, certFile, keyFile string, stopChan <-chan struct{}, wg *sync.WaitGroup)
 }
@@ -43,8 +44,8 @@ func (s *shim) RegisterOvnDBMetrics(stopChan <-chan struct{}) {
 	)
 }
 
-func (s *shim) RegisterOvnControllerMetrics(stopChan <-chan struct{}) {
-	metrics.RegisterOvnControllerMetrics(stopChan)
+func (s *shim) RegisterOvnControllerMetrics(ovsDBClient libovsdbclient.Client, metricsScrapeInterval int, stopChan <-chan struct{}) {
+	metrics.RegisterOvnControllerMetrics(ovsDBClient, metricsScrapeInterval, stopChan)
 }
 
 func (s *shim) RegisterOvnNorthdMetrics(stopChan <-chan struct{}) {
@@ -54,8 +55,8 @@ func (s *shim) RegisterOvnNorthdMetrics(stopChan <-chan struct{}) {
 	)
 }
 
-func (s *shim) RegisterOvsMetricsWithOvnMetrics(stopChan <-chan struct{}) {
-	metrics.RegisterOvsMetricsWithOvnMetrics(stopChan)
+func (s *shim) RegisterOvsMetricsWithOvnMetrics(ovsDBClient libovsdbclient.Client, metricsScrapeInterval int, stopChan <-chan struct{}) {
+	metrics.RegisterOvsMetricsWithOvnMetrics(ovsDBClient, metricsScrapeInterval, stopChan)
 }
 
 func (s *shim) StartOVNMetricsServer(bindAddress, certFile, keyFile string, stopChan <-chan struct{}, wg *sync.WaitGroup) {

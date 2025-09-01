@@ -96,5 +96,5 @@ teardown_file() {
         done
     fi
 
-    delete_containers $TEST_CONTAINERS
+    # delete_containers $TEST_CONTAINERS
 }
